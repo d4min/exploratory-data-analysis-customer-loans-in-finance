@@ -15,11 +15,11 @@ class RDSDatabaseConnector:
             credentials_file: Path to the YAML credentials file
         """
         credentials = self.load_credentials(credentials_file)
-        self.host = credentials['HOST']
-        self.user = credentials['USER']
-        self.password = credentials['PASSWORD']
-        self.database = credentials['DATABASE']
-        self.port = credentials['PORT']
+        self.host = credentials['RDS_HOST']
+        self.user = credentials['RDS_USER']
+        self.password = credentials['RDS_PASSWORD']
+        self.database = credentials['RDS_DATABASE']
+        self.port = credentials['RDS_PORT']
 
     def load_credentials(self, file_path='credentials.yaml'):
         """
@@ -93,4 +93,30 @@ class RDSDatabaseConnector:
             print(f"Data successfully saved to {file_path}")
         except Exception as e:
             raise Exception(f"Failed to save data to CSV: {e}")
+        
+    def load_data_from_csv(self, file_path='loan_payments.csv'):
+        """
+        Load data from a local CSV file into a pandas DataFrame.
 
+        Args:
+            file_path: Path to the CSV file (Defaults to loan_payments.csv)
+        
+        Returns:
+            pandas.DataFrame: DaraFrame containing the loan payments data
+        """
+        try:
+            df = pd.read_csv(file_path)
+            print(f"Data successfully loaded from {file_path}")
+            return df
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                f"CSV file not found at {file_path}. "
+                "Please extract data from database first using extract_data() "
+                "and save it using save_to_csv()"
+            )
+
+
+db_connector = RDSDatabaseConnector
+
+loan_payments = db_connector.load_data_from_csv()
+      
